@@ -1,0 +1,14 @@
+name: my-learning-app
+url: http://example.com
+public: false
+default_permissions:
+  issues: write
+  pull_requests: write
+  checks: write
+
+default_events:
+  - issues
+  - pull_requests
+  - issue_comment
+  - check_suite
+  - check_run

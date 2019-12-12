@@ -1,71 +1,31 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const log = require('./logger')('index.js');
-const debounce = require('debounce');
+const { createLogger, logWebhookPayload } = require('./logger');
+// const debounce = require('debounce');
+// const { make_github_rest_api_call } = require('./gh_utils');
 
-const { make_github_rest_api_call } = require('./gh_utils');
+const log = createLogger('./app.js');
 
-const app = express();
+// use port 5000 unless told otherwise by PORT env variable
+if (typeof process.env.PORT === 'undefined') process.env.PORT = 5000;
 
-app.use(bodyParser.json());
+// application entry point
+async function main() {
+  // create an app
+  const app = express();
 
-const debouncedCreateOrUpdateComment = debounce(
-  createOrUpdateComment,
-  250,
-  false
-);
-app.post('/webhook', async function(req, resp) {
-  const {
-    repository: {
-      name: repo,
-      owner: { login: owner }
-    },
-    issue: { number: issueNumber }
-  } = req.body;
-  await debouncedCreateOrUpdateComment(
-    { repo, owner, issueNumber },
-    { marker: 'MY_SPECIAL_BOT' },
-    'The time is ' + new Date().toISOString()
-  );
-});
+  // parse incoming request bodies as JSON
+  app.use(bodyParser.json());
 
-app.listen(process.env.PORT || 5000, function() {
-  log.info('Listening on http://localhost:5000');
-});
+  // webhook receiver function
+  app.post('/webhook', async function(req, resp) {
+    logWebhookPayload(log, req);
+  });
 
-/**
- *
- * @param {{ repo: string, owner: string, issueNumber: number}} param0
- * @param {{ marker: string}} param1
- * @param {string} body
- */
-async function createOrUpdateComment(
-  { repo, owner, issueNumber },
-  { marker },
-  body
-) {
-  const token = `<!-- ${marker} -->`;
-  const comments = await make_github_rest_api_call(
-    `repos/${owner}/${repo}/issues/${issueNumber}/comments`
-  );
-  const [match] = comments.filter(comment => comment.body.indexOf(token) >= 0);
-  if (match) {
-    await make_github_rest_api_call(
-      `repos/${owner}/${repo}/issues/comments/${match.id}`,
-      'PATCH',
-      {
-        body: `${body}
-${token}`
-      }
-    );
-  } else {
-    await make_github_rest_api_call(
-      `repos/${owner}/${repo}/issues/${issueNumber}/comments`,
-      'POST',
-      {
-        body: `${body}
-${token}`
-      }
-    );
-  }
+  // start the app
+  app.listen(process.env.PORT, function() {
+    log.info('Listening on http://localhost:5000');
+  });
 }
+
+main();

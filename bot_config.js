@@ -1,4 +1,4 @@
-const log = require('./logger')('bot-config.js');
+const log = require('./logger').createLogger('bot-config.js');
 /**
  * SECRETS & CONFIG
  * =================
@@ -31,13 +31,13 @@ function validate_env_variables() {
     .map(k => [k, env_vars[k]])
     .reduce((acc, item) => {
       if (item[1] === -1 || item[1].trim() === '')
-        return `${acc}\n\t\t\t\t${item[0]}`;
+        return `${acc}\n - ${item[0]}`;
       else return acc;
     }, '');
   log.warn(
-    'The following environment variables were found to be empty:\n' +
+    'Preflight check warning:\nThe following environment variables were found to be empty...\n' +
       blanks_msg +
-      "\n\n\t\t\t\tThis may be fine, depending on which exercise you're currently working on"
+      "\n\nThis may be fine, depending on which exercise you're on"
   );
 }
 

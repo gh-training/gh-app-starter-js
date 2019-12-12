@@ -1,7 +1,7 @@
 // @ts-check
 const fetch = require('node-fetch').default;
 const base64 = require('base-64');
-const log = require('./logger')('./gh_utils.js');
+const log = require('./logger').createLogger('./gh_utils.js');
 
 const { GH_USER, GH_USER_TOKEN, API_BASE_URL } = require('./bot_config');
 /**
