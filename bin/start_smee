@@ -1,0 +1,22 @@
+#!/bin/bash
+test ! -f .env && echo "Could not find a .env file. You may want to copy .env.example to .env" && exit 1
+
+# setup environment based on .env
+export $(egrep -v '^#' .env | xargs)
+
+# check for the presence of WEBHOOK_PROXY_URL
+eval val=\""\$WEBHOOK_PROXY_URL"\"
+if [[ -z "${val}" ]]; then
+  echo "🛑 WEBHOOK_PROXY_URL has not been set. Please provide a value in your .env file"
+  echo ""
+  exit 1
+else
+  echo "✅ Starting webhook proxy w/ WEBHOOK_PROXY_URL=$WEBHOOK_PROXY_URL"
+  echo ""
+fi
+
+# allow for the detection of the running webhook proxy
+export WEBHOOK_PROXY_IS_RUNNING=1
+yarn smee -u $WEBHOOK_PROXY_URL -P '/webhook' -p 5000
+# indicate that the webhook proxy has been shut down
+unset WEBHOOK_PROXY_IS_RUNNING
