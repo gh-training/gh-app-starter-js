@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const { createLogger, logWebhookPayload } = require('./logger');
 // const debounce = require('debounce');
-// const { make_github_rest_api_call } = require('./gh_utils');
+const { make_github_rest_api_call } = require('./gh_utils');
 
 const log = createLogger('./app.js');
 
@@ -20,6 +20,10 @@ async function main() {
   // webhook receiver function
   app.post('/webhook', async function(req, resp) {
     logWebhookPayload(log, req);
+    console.log("header: ", req.header("x-github-event"));
+    console.log("body.action: ", req.body.action);
+    console.log("body.issue.comments_url: ", req.body.issue.comments_url);
+    
   });
 
   // start the app
