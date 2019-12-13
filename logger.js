@@ -8,6 +8,7 @@ const PARENT_LOGGER = winston.createLogger({
   format: winston.format.combine(
     winston.format.colorize(),
     winston.format.metadata(),
+
     winston.format.timestamp({ format: 'HH:mm:ss.SS', colorize: true }),
     winston.format.printf(
       ({ level, message, metadata: { fileName }, timestamp }) => {

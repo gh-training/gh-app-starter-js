@@ -2,7 +2,7 @@
 const fetch = require('node-fetch').default;
 const base64 = require('base-64');
 const log = require('./logger').createLogger('./gh_utils.js');
-
+const { retrieve_token } = require('./gh_oauth_token');
 const { GH_USER, GH_USER_TOKEN, API_BASE_URL } = require('./bot_config');
 /**
  *
@@ -11,7 +11,7 @@ const { GH_USER, GH_USER_TOKEN, API_BASE_URL } = require('./bot_config');
  * Use this function to make API calls to the GitHub REST api
  *
  * @param {string} path API path
- * @param {'GET'|'POST'|'PUT'|'DELETE'} verb HTTP verb
+ * @param {'GET'|'POST'|'PUT'|'PATCH'|'DELETE'} verb HTTP verb
  * @param {*} data
  *
  * @example
@@ -31,8 +31,10 @@ async function make_github_rest_api_call(path, verb = 'GET', data = null) {
   const headers = {
     'Accept': 'application/vnd.github.antiope-preview+json',
     'Content-Type': 'application/json',
-    'Authorization': `Basic ${base64.encode(GH_USER + ':' + GH_USER_TOKEN)}`
+    // 'Authorization': `Basic ${base64.encode(GH_USER + ':' + GH_USER_TOKEN)}`
+    'Authorization': `Bearer ${await retrieve_token()}`
   };
+  log.debug(`HEADERS: ${JSON.stringify(headers)}`);
   const opts = {
     headers,
     method: verb

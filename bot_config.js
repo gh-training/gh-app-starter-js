@@ -9,13 +9,13 @@ const log = require('./logger').createLogger('bot-config.js');
  * You'll get warnings if any of these are unset
  */
 
-const GH_USER = process.env.GH_USER || -1;
-const GH_USER_TOKEN = process.env.GH_USER_TOKEN || -1;
-const API_BASE_URL = process.env.API_BASE_URL || -1;
-const GH_APP_ID = process.env.GH_APP_ID || -1;
-const GH_APP_CLIENT_ID = process.env.GH_APP_CLIENT_ID || -1;
-const GH_APP_CLIENT_SECRET = process.env.GH_APP_CLIENT_SECRET || -1;
-const GH_APP_PRIVATE_KEY_PATH = process.env.GH_APP_PRIVATE_KEY_PATH || -1;
+const GH_USER = process.env.GH_USER || '';
+const GH_USER_TOKEN = process.env.GH_USER_TOKEN || '';
+const API_BASE_URL = process.env.API_BASE_URL || '';
+const GH_APP_ID = process.env.GH_APP_ID || '';
+const GH_APP_CLIENT_ID = process.env.GH_APP_CLIENT_ID || '';
+const GH_APP_CLIENT_SECRET = process.env.GH_APP_CLIENT_SECRET || '';
+const GH_APP_PRIVATE_KEY_PATH = process.env.GH_APP_PRIVATE_KEY_PATH || '';
 
 const env_vars = {
   GH_USER: GH_USER,
@@ -30,8 +30,7 @@ function validate_env_variables() {
   const blanks_msg = Object.keys(env_vars)
     .map(k => [k, env_vars[k]])
     .reduce((acc, item) => {
-      if (item[1] === -1 || item[1].trim() === '')
-        return `${acc}\n - ${item[0]}`;
+      if (item[1].trim() === '') return `${acc}\n - ${item[0]}`;
       else return acc;
     }, '');
   log.warn(
